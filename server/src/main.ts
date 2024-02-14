@@ -18,8 +18,8 @@ async function bootstrap() {
   app.use(urlencoded({ extended: true, limit: '50mb' }));
   app.enableCors(corsOptions);
 
-
-
-  await app.listen(3000);
+  await app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+  });
 }
 bootstrap();

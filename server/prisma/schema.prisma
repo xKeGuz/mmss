@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://jguzman:ferxxo100@localhost:5432/mmss"
 }
 
 model UserRole {
@@ -26,7 +26,7 @@ model User {
   password         String
   email            String
   photo_url        String?
-  last_login       DateTime
+  last_login       DateTime?
   role_id          Int
   is_active        Boolean
   created_at       DateTime @default(now())

@@ -1,12 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `UserRole` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-DROP TABLE "UserRole";
-
 -- CreateTable
 CREATE TABLE "user_role" (
     "role_id" SERIAL NOT NULL,
@@ -26,7 +17,7 @@ CREATE TABLE "user" (
     "password" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "photo_url" TEXT,
-    "last_login" TIMESTAMP(3) NOT NULL,
+    "last_login" TIMESTAMP(3),
     "role_id" INTEGER NOT NULL,
     "is_active" BOOLEAN NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

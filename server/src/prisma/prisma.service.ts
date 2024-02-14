@@ -7,7 +7,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     await this.$connect()
       .then(() => {
         console.log(
-          '🚀 ~ PrismaService ~ Conection service was successfully done',
+          '🚀 ~ PrismaService ~ Conection service to the Database was successfully',
         );
       })
       .catch((e) => {
