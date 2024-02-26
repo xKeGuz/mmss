@@ -4,12 +4,16 @@ import { HandlersError } from '../shared/handlers/error.utils';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import { BcryptUtils } from '../shared/utils/bcrypt.utils';
+import { JwtService } from '@nestjs/jwt';
+import { env } from 'process';
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly _handlersError: HandlersError,
     private readonly _prisma: PrismaService,
     private readonly _bcrypt: BcryptUtils,
+    private readonly _jwtService: JwtService,
   ) {}
 
   async login(loginDto: LoginAuthDto) {
@@ -46,7 +50,7 @@ export class AuthService {
         });
       }
 
-      const validPassword: boolean = await this._bcrypt.matches(
+      const validPassword: boolean = this._bcrypt.matches(
         password,
         findUser.password,
       );
@@ -60,6 +64,15 @@ export class AuthService {
         });
       }
 
+      await this._prisma.user.update({
+        where: {
+          user_id: findUser.user_id,
+        },
+        data: {
+          last_login: new Date(),
+        },
+      });
+
       return {
         response: {
           user: {
@@ -69,14 +82,22 @@ export class AuthService {
             first_name: findUser.first_name,
             middle_name: findUser.middle_name,
             last_name: findUser.last_name,
-            se: findUser.second_last_name,
+            second_last_name: findUser.second_last_name,
             last_login: findUser.last_login,
             role_id: findUser.role_id,
           },
-          token: {},
-          workspace: {}
+          token: this._jwtService.sign(
+            {
+              user_id: findUser.user_id,
+              username: findUser.username,
+              email: findUser.email,
+              role_id: findUser.role_id,
+            },
+            { secret: env.JWT_SECRET },
+          ),
+          workspace: {},
         },
-        title: '🟢 Success: Welcome to MMSS',
+        title: '🟢 Welcome to MMSS',
         message: 'User logged in successfully',
         valid: true,
         statusCode: HttpStatus.OK,
