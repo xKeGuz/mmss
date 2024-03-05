@@ -85,6 +85,7 @@ export class AuthService {
             second_last_name: findUser.second_last_name,
             last_login: findUser.last_login,
             role_id: findUser.role_id,
+            full_name: `${findUser.first_name} ${findUser.last_name}`,
           },
           token: this._jwtService.sign(
             {
