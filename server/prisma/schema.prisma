@@ -4,20 +4,19 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://jguzman:ferxxo100@localhost:5432/mmss"
+  url      = env("DATABASE_URL")
 }
 
 model UserRole {
   role_id Int    @id @default(autoincrement())
   name    String
-
-  user User[]
+  user    User[]
 
   @@map("user_role")
 }
 
 model User {
-  user_id          Int      @id @default(autoincrement())
+  user_id          Int       @id @default(autoincrement())
   first_name       String
   middle_name      String?
   last_name        String
@@ -29,12 +28,11 @@ model User {
   last_login       DateTime?
   role_id          Int
   is_active        Boolean
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
   last_updated_by  Int?
   created_by       Int?
-
-  UserRole UserRole @relation(fields: [role_id], references: [role_id])
+  UserRole         UserRole  @relation(fields: [role_id], references: [role_id])
 
   @@map("user")
 }
