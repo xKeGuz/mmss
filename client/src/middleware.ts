@@ -38,5 +38,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/', '/workspace', '/login', '/register'],
+  matcher: ['/', '/dashboard/:path*', '/workspace', '/login', '/register'],
 };

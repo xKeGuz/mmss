@@ -17,9 +17,19 @@ const handler = NextAuth({
       },
 
       async authorize(credentials, req) {
-        console.log('credentials', credentials);
+        const user = await fetch(`${process.env.SERVER_URL}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(credentials),
+        }).then((res) => res.json());
 
-        return null;
+        if (!user.valid) {
+          throw new Error(user.title);
+        }
+
+        return user.response;
       },
     }),
   ],
@@ -37,9 +47,9 @@ const handler = NextAuth({
     }) {
       if (user) token.user = user;
 
-      if (trigger === 'update') {
-        return { ...token, user: session.user };
-      }
+      // if (trigger === 'update') {
+      //   return { ...token, user: session.user };
+      // }
 
       return token;
     },
