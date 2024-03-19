@@ -41,6 +41,17 @@ export class HandlersError {
     };
   }
 
+  public returnErrorDataAlreadyExist(config: configReturnError): returnErrorDto {
+    const { error } = config;
+    return {
+      response: {},
+      title: '❌ Error: Data already exist',
+      message: error?.message ? error.message : 'Data not found',
+      valid: false,
+      statusCode: HttpStatus.NOT_FOUND,
+    };
+  }
+
   public returnWarning(config: configReturnError): returnErrorDto {
     const { error } = config;
     return {
@@ -63,7 +74,7 @@ export class HandlersError {
       data: error.response,
       logs: {
         response: error?.response ? error.response : {},
-        title: error?.title ? error.title : 'Opps! Algo salió mal',
+        title: error?.title ? error.title : 'Opps! Something went wrong',
         message: error?.message ? error.message : 'INTERNAL_SERVER_ERROR',
         valid: error?.valid ? error.valid : false,
         statusCode: error?.statusCode
@@ -82,7 +93,7 @@ export class HandlersError {
     }
     return {
       response: error?.response ? error.response : {},
-      title: 'Opps! Algo salió mal',
+      title: 'Opps! Something went wrong',
       message: `[${className}] => error: ${error}`,
       valid: false,
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

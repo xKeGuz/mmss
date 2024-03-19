@@ -23,7 +23,7 @@ model User {
   second_last_name String?
   username         String
   password         String
-  email            String
+  email            String    @unique
   photo_url        String?
   last_login       DateTime?
   role_id          Int

@@ -85,6 +85,7 @@ export class AuthService {
             second_last_name: findUser.second_last_name,
             last_login: findUser.last_login,
             role_id: findUser.role_id,
+            photo_url: findUser.photo_url,
             full_name: `${findUser.first_name} ${findUser.last_name}`,
           },
           token: this._jwtService.sign(
@@ -106,5 +107,77 @@ export class AuthService {
     } catch (error) {
       return this._handlersError.returnErrorResponse({ error, debug: true });
     }
+  }
+
+  async register(data: Prisma.UserCreateInput) {
+    console.log('🚀 ~ AuthService ~ register ~ data:', data);
+    try {
+      if (
+        !data.first_name ||
+        !data.last_name ||
+        !data.password ||
+        !data.email
+      ) {
+        return this._handlersError.returnErrorFieldRequired();
+      }
+
+      if (data.password.length < 8) {
+        return this._handlersError.returnWarning({
+          error: {
+            message: 'The password must have at least 8 characters',
+          },
+        });
+      }
+
+      const emailExists = await this._prisma.user.findFirst({
+        where: {
+          email: data.email,
+        },
+      });
+
+      if (emailExists) {
+        return this._handlersError.returnErrorDataAlreadyExist({
+          error: {
+            message: `The email ${data.email} already exists`,
+          },
+          debug: true,
+        });
+      }
+
+      const username = await this.getUsernameFromEmail(data.email);
+
+      const createUser = await this._prisma.user.create({
+        data: {
+          ...data,
+          is_active: true,
+          username,
+          password: this._bcrypt.encode(data.password),
+          photo_url: `${env.BORING_URL}/${username}`,
+          UserRole: {
+            connect: {
+              role_id: 1,
+            },
+          },
+        },
+      });
+
+      return {
+        response: {
+          createUser,
+        },
+        title: '🟢 Welcome to MMSS',
+        message: 'User registered successfully',
+        valid: true,
+        statusCode: HttpStatus.OK,
+      };
+    } catch (error) {
+      return this._handlersError.returnErrorResponse({ error, debug: true });
+    }
+  }
+
+  async getUsernameFromEmail(email: string) {
+    const regex = /^([^@]+)@/;
+    const match = email.match(regex);
+    return match ? match[1] : null;
   }
 }
