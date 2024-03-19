@@ -21,21 +21,40 @@ import {
   FormMessage,
 } from '../ui';
 import { Icons } from '..';
+import { RegisterUser } from '@/actions';
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {
   isRegister?: boolean;
 }
 
 const FormSchema = z.object({
+  first_name: z
+    .string()
+    .min(2, {
+      message: 'First name must be at least be 2 characters',
+    })
+    .optional(),
+  middle_name: z
+    .string()
+    .min(2, {
+      message: 'Second name must be at least be 2 characters',
+    })
+    .optional(),
+  last_name: z
+    .string()
+    .min(2, {
+      message: 'First last name must be at least be 2 characters',
+    })
+    .optional(),
+  second_last_name: z
+    .string()
+    .min(2, {
+      message: 'Second last name must be at least be 2 characters',
+    })
+    .optional(),
   email: z.string().email({
     message: 'Please enter a valid email address.',
   }),
-  username: z
-    .string()
-    .min(2, {
-      message: 'Username must be at least 2 characters.',
-    })
-    .optional(),
   password: z.string().min(6, {
     message: 'Password must be at least 6 characters.',
   }),
@@ -48,8 +67,11 @@ export function AuthForm({ className, isRegister, ...props }: Readonly<UserAuthF
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
+      first_name: isRegister ? '' : undefined,
+      middle_name: undefined,
+      last_name: isRegister ? '' : undefined,
+      second_last_name: undefined,
       email: '',
-      username: isRegister ? '' : undefined,
       password: '',
     },
   });
@@ -78,31 +100,23 @@ export function AuthForm({ className, isRegister, ...props }: Readonly<UserAuthF
     }
   };
 
-  const startRegister = async (email: string, password: string, username: string) => {
+  const startRegister = async (data: any) => {
     setIsLoading(true);
 
     try {
-      // const user = await registerUser(email, password, username);
+      const user = await RegisterUser(data);
+      console.log(user);
 
       setIsLoading(false);
 
-      // if (!user.ok) {
-      //   if (user.error === 'emailExists') {
-      //     form.setError('email', {
-      //       message: 'Email already exists.',
-      //     });
-      //   }
+      if (!user.valid) {
+        toast.error(user.message);
+        form.setError('email', { message: user.message });
+        console.log('user already registered');
+        return;
+      }
 
-      //   if (user.error === 'usernameExists') {
-      //     form.setError('username', {
-      //       message: 'Username already exists.',
-      //     });
-      //   }
-
-      //   return toast.error(user.errorMessage);
-      // }
-
-      // await startLogin(email, password);
+      await startLogin(data.email, data.password);
 
       setIsLoading(false);
     } catch (error) {
@@ -113,10 +127,10 @@ export function AuthForm({ className, isRegister, ...props }: Readonly<UserAuthF
   };
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    const { email, password, username } = data;
+    const { email, password } = data;
 
     if (isRegister) {
-      startRegister(email, password, username!);
+      startRegister(data);
     } else {
       startLogin(email, password);
     }
@@ -144,12 +158,25 @@ export function AuthForm({ className, isRegister, ...props }: Readonly<UserAuthF
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" autoComplete="off">
               <FormField
                 control={form.control}
-                name="email"
+                name="first_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Fisrt Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Email" {...field} autoComplete="email" />
+                      <Input placeholder="Fisrt Name" {...field} autoComplete="fisrtName" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="middle_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Second Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Second Name" {...field} autoComplete="middle_name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -158,18 +185,48 @@ export function AuthForm({ className, isRegister, ...props }: Readonly<UserAuthF
               {isRegister && (
                 <FormField
                   control={form.control}
-                  name="username"
+                  name="last_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Username</FormLabel>
+                      <FormLabel>Last Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Username" {...field} autoComplete="username" />
+                        <Input placeholder="Last Name" {...field} autoComplete="last_name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               )}
+              <FormField
+                control={form.control}
+                name="second_last_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Second Last Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter second last name"
+                        {...field}
+                        autoComplete="second_last_name"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter Email" {...field} autoComplete="Email" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="password"
