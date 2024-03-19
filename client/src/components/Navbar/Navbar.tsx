@@ -1,7 +1,10 @@
+// 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Input } from '../ui';
-// import { UserNav, WorkspaceSwitcher } from '..';
+import { UserNav } from './components/UserNav/UserNav';
+
+// import {  WorkspaceSwitcher } from '..';
 // import { getActiveWorkspace } from '@/actions';
 
 export const Navbar = async () => {
@@ -23,7 +26,7 @@ export const Navbar = async () => {
       </div>
       <div className="ml-auto flex items-center gap-6">
         {/* <WorkspaceSwitcher activeWorkspaceID={activeWorkspaceID!} /> */}
-        {/* <UserNav /> */}
+        <UserNav />
       </div>
     </div>
   );
